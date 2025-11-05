@@ -142,8 +142,9 @@ function ChatRooms() {
             </a>
           </div>
         </div>
-      </div> {/* overlay close */}
-    </div> {/* background close */}
+      </div>
+    </div>
+    {/* overlay and background close */}
   );
 }
 
