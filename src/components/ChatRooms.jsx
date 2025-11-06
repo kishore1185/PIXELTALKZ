@@ -52,7 +52,11 @@ function ChatRooms() {
   ];
 
   return (
-    <div className="min-h-screen bg-white text-zinc-900">
+    <div 
+      className="min-h-screen bg-cover bg-centre bg-fixed relative text-zinc-900" style={{ backgroundimage: "url('/chatbg.png')"}}
+      >
+      <div classname="absolute inset-0 bg-white/80 dark:bg-black/60 backdrop-blur-[1px]"> </div>
+      <div classname="relative z=10">
       {/* Navbar */}
       <header className="sticky top-0 z-40 w-full backdrop-blur supports-[backdrop-filter]:bg-white/70 bg-white/80 border-b border-zinc-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
@@ -176,6 +180,7 @@ function ChatRooms() {
           </a>
         </div>
       </div>
+    </div>
     </div>
   );
 }
