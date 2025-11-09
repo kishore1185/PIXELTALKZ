@@ -4,7 +4,7 @@ import MessageInput from "./message-input.jsx";
 import ThemeToggle from "./theme-toggle.jsx";
 import { ArrowLeft } from "lucide-react";
 import { useParams, Link } from "react-router-dom";
-import { db } from "../firebase.js";
+import { db } from "../lib/firebase.js";
 import { collection, getDocs, deleteDoc } from "firebase/firestore";
 import { useState } from "react";
 
