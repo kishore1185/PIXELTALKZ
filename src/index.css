@@ -82,3 +82,24 @@
   scrollbar-width: thin;
   scrollbar-color: #a1a1aa transparent; /* Thumb color, Track transparent */
 }
+
+/* Neon Glow */
+.neon-glow {
+  box-shadow: 0px 0px 12px rgba(0, 255, 135, 0.7), 0px 0px 18px rgba(96, 239, 255, 0.6);
+  transition: all 0.35s ease-in-out;
+}
+
+.neon-glow:hover {
+  box-shadow: 0px 0px 18px rgba(0, 255, 135, 0.95), 0px 0px 24px rgba(96, 239, 255, 0.9);
+  transform: translateY(-4px) scale(1.02);
+}
+
+/* Card Entrance Animation */
+@keyframes fadePop {
+  0% { opacity: 0; transform: scale(0.92); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+.fade-pop {
+  animation: fadePop 0.55s ease-out;
+}
