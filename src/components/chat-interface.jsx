@@ -3,14 +3,14 @@ import MessageList from "./message-list.jsx";
 import MessageInput from "./message-input.jsx";
 import ThemeToggle from "./theme-toggle.jsx";
 import { ArrowLeft } from "lucide-react";
+import { useParams, Link } from "react-router-dom";
+import { db } from "../lib/firebase.js";
+import { collection, getDocs, deleteDoc } from "firebase/firestore";
+import { useState } from "react";
 
-import { useParams } from "react-router-dom";
-
-import { Link } from "react-router-dom";
-
-export  function ChatInterface({ isChatRoom }) {
-
-  const { roomId } = useParams(); // Get the roomId from the URL params
+export function ChatInterface({ isChatRoom }) {
+  const { roomId } = useParams();
+  const [clearing, setClearing] = useState(false);
 
   const {
     messages,
@@ -26,8 +26,30 @@ export  function ChatInterface({ isChatRoom }) {
     aiEnabled,
     setAiEnabled,
     loadMore,
-    hasMore
+    hasMore,
   } = useChat(roomId);
+
+  // 🧹 Admin Clear Chat Function
+  const handleClearChat = async () => {
+    if (userSession.nickname !== "Kishore") return;
+    if (!window.confirm("Are you sure you want to clear all messages in this room?")) return;
+
+    try {
+      setClearing(true);
+      const messagesRef = collection(db, roomId);
+      const snapshot = await getDocs(messagesRef);
+
+      const deletions = snapshot.docs.map((doc) => deleteDoc(doc.ref));
+      await Promise.all(deletions);
+
+      alert("✅ Chat cleared successfully!");
+    } catch (error) {
+      console.error("Error clearing chat:", error);
+      alert("❌ Failed to clear chat. Check console for details.");
+    } finally {
+      setClearing(false);
+    }
+  };
 
   if (error) {
     return (
@@ -36,19 +58,19 @@ export  function ChatInterface({ isChatRoom }) {
           <div className="bg-destructive/10 text-destructive p-4 rounded-lg">
             <h3 className="font-bold mb-2">Error</h3>
             <p>{error}</p>
-            {error.includes('security rules') && (
+            {error.includes("security rules") && (
               <div className="mt-4 p-4 bg-muted rounded-lg text-sm">
                 <p className="font-medium mb-2">Firebase Security Rules Setup:</p>
                 <ol className="list-decimal pl-5 space-y-1">
-                  <li>Go to the Firebase Console </li>
-                  <li>Select your project bro</li>
+                  <li>Go to the Firebase Console</li>
+                  <li>Select your project</li>
                   <li>Navigate to Firestore Database</li>
                   <li>Click on the "Rules" tab</li>
                   <li>Update the rules to allow read/write access to the messages collection</li>
                 </ol>
               </div>
             )}
-            <button 
+            <button
               className="mt-4 px-4 py-2 border border-input rounded-md bg-background hover:bg-accent hover:text-accent-foreground"
               onClick={() => window.location.reload()}
             >
@@ -61,22 +83,26 @@ export  function ChatInterface({ isChatRoom }) {
   }
 
   return (
-    <div className={
-      isChatRoom
-        ? "w-screen h-[100dvh] max-w-none md:max-w-5xl md:mx-auto md:h-screen flex flex-col rounded-none md:rounded-lg border dark:border-zinc-800 border-zinc-300 dark:bg-zinc-900 bg-zinc-100 text-card-foreground shadow-sm fixed top-0 left-0 md:relative z-50"
-        : "w-full max-w-5xl mx-auto flex flex-col rounded-lg border dark:bg-zinc-900 bg-zinc-100 text-card-foreground shadow-sm"
-    }>
+    <div
+      className={
+        isChatRoom
+          ? "w-screen h-[100dvh] max-w-none md:max-w-5xl md:mx-auto md:h-screen flex flex-col rounded-none md:rounded-lg border dark:border-zinc-800 border-zinc-300 dark:bg-zinc-900 bg-zinc-100 text-card-foreground shadow-sm fixed top-0 left-0 md:relative z-50"
+          : "w-full max-w-5xl mx-auto flex flex-col rounded-lg border dark:bg-zinc-900 bg-zinc-100 text-card-foreground shadow-sm"
+      }
+    >
+      {/* Header */}
       <div className="px-6 md:py-2 py-2 border-b dark:border-zinc-800 border-zinc-300 flex flex-row items-center justify-between">
         <div className="flex items-center gap-3 select-none">
           <Link to="/" aria-label="Back to home" className="p-1 -ml-2 hover:text-blue-600 transition-colors">
             <ArrowLeft className="w-6 h-6" />
           </Link>
-          <h3 className="md:text-2xl font-semibold leading-none tracking-tight">VibeTalkz - {roomId}</h3>
+          <h3 className="md:text-2xl font-semibold leading-none tracking-tight">PixelTalkz - {roomId}</h3>
         </div>
         <ThemeToggle />
       </div>
 
-  <div className="flex-1 overflow-hidden flex flex-col min-h-0">
+      {/* Chat Body */}
+      <div className="flex-1 overflow-hidden flex flex-col min-h-0">
         <MessageList
           messages={messages}
           currentUserId={userSession.id}
@@ -86,6 +112,23 @@ export  function ChatInterface({ isChatRoom }) {
           onLoadMore={loadMore}
           hasMore={hasMore}
         />
+
+        {/* 🧹 Clear Chat (Admin Only) */}
+        {userSession.nickname === "Kishore" && (
+          <div className="flex justify-center mb-2">
+            <button
+              onClick={handleClearChat}
+              disabled={clearing}
+              className={`px-4 py-2 text-sm font-semibold rounded-md ${
+                clearing
+                  ? "bg-red-300 cursor-not-allowed"
+                  : "bg-red-600 hover:bg-red-700 text-white"
+              } transition-all`}
+            >
+              {clearing ? "Clearing..." : "🧹 Clear Chat (Admin)"}
+            </button>
+          </div>
+        )}
 
         <MessageInput
           onSendMessage={sendMessage}
