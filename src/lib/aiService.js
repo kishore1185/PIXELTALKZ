@@ -5,7 +5,7 @@ import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 // AI Bot user details
 export const AI_BOT = {
   id: 'ai-assistant-bot',
-  nickname: 'ChatBot',
+  nickname: 'PixelBot',
   color: 'bg-amber-500', // Distinct color for the AI
 };
 
