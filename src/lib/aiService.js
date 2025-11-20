@@ -59,7 +59,7 @@ export async function generateAIResponse(question) {
 
   // First attempt: Gemini-style body (current behavior)
   try {
-    const response = await fetch('https://still-lake-1a8f.talaganarajesh25.workers.dev/', {
+    const response = await fetch('https://pixeltalkz-ai.2005kishore-sb.workers.dev/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -114,7 +114,7 @@ export async function generateAIResponse(question) {
 
   // Second attempt: simpler payload many CF workers expect
   try {
-    const response2 = await fetch('https://still-lake-1a8f.talaganarajesh25.workers.dev/', {
+    const response2 = await fetch('https://pixeltalkz-ai.2005kishore-sb.workers.dev/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
