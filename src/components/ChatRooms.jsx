@@ -82,8 +82,6 @@ function ChatRooms() {
       style={{ backgroundImage: "url('/chatbg.png')" }}
       data-theme="light"
     >
-      {/* Overlay */}
-      <div className="absolute inset-0 bg-white/85 backdrop-blur-[1px]" />
 
       {/* Content */}
       <div className="relative z-10">
