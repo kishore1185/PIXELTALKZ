@@ -103,3 +103,34 @@
 .fade-pop {
   animation: fadePop 0.55s ease-out;
 }
+
+/* 🌈 RAINBOW NEON THEME */
+.rainbow-text {
+  background: linear-gradient(90deg, #ff00ea, #ff7bf7, #00eaff, #00ffad);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.rainbow-glow {
+  border: 2px solid transparent;
+  background: linear-gradient(#fff, #fff) padding-box,
+              linear-gradient(90deg, #ff00ea, #ff7bf7, #00eaff, #00ffad) border-box;
+  box-shadow: 0 0 18px rgba(255, 0, 234, 0.6),
+              0 0 24px rgba(0, 234, 255, 0.6),
+              0 0 28px rgba(0, 255, 173, 0.6);
+  transition: all 0.35s ease-in-out;
+}
+
+/* Hover Glow Boost */
+.rainbow-glow:hover {
+  box-shadow: 0 0 25px rgba(255, 0, 234, 0.8),
+              0 0 35px rgba(0, 234, 255, 0.9),
+              0 0 40px rgba(0, 255, 173, 0.9);
+  transform: translateY(-4px) scale(1.03);
+}
+
+/* 🌈 Gradient Background for Featured Banner */
+.rainbow-banner {
+  background: linear-gradient(90deg, #ff00ea, #ff7bf7, #00eaff, #00ffad);
+  color: white;
+}
