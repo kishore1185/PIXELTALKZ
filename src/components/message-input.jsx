@@ -10,11 +10,13 @@ export default function MessageInput({ onSendMessage, onSetNickname, replyingTo,
 
   const [message, setMessage] = useState("")
   const [error, setError] = useState(null)
+
+  // 🎤 Recorder States
   const [recording, setRecording] = useState(false)
-  const [recorder, setRecorder] = useState(null)
+  const recorderRef = useRef(null)
+  const chunks = useRef([])
 
   const inputRef = useRef(null)
-  const chunks = useRef([]) // audio chunks
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -34,23 +36,24 @@ export default function MessageInput({ onSendMessage, onSetNickname, replyingTo,
     if (inputRef.current) inputRef.current.focus()
   }
 
+  // 🎤 Start Recording
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-      const mediaRecorder = new MediaRecorder(stream)
-      setRecorder(mediaRecorder)
+      const mediaRecorder = new MediaRecorder(stream, { mimeType: "audio/webm" })
+      recorderRef.current = mediaRecorder
       chunks.current = []
-      mediaRecorder.start()
-      setRecording(true)
 
       mediaRecorder.ondataavailable = e => chunks.current.push(e.data)
 
       mediaRecorder.onstop = async () => {
         const blob = new Blob(chunks.current, { type: "audio/webm" })
-        // send audio as a message through parent function
         await onSendMessage({ audio: blob }, replyingTo)
         if (replyingTo) onCancelReply()
       }
+
+      mediaRecorder.start()
+      setRecording(true)
 
       // Auto stop after 60 seconds
       setTimeout(() => {
@@ -63,14 +66,15 @@ export default function MessageInput({ onSendMessage, onSetNickname, replyingTo,
     }
   }
 
+  // 🛑 Stop Recording Manually
   const stopRecording = () => {
-    if (recorder && recorder.state !== "inactive") {
-      recorder.stop()
+    if (recorderRef.current && recorderRef.current.state !== "inactive") {
+      recorderRef.current.stop()
       setRecording(false)
     }
   }
 
-  // Focus input on mount
+  // Focus on mount
   useEffect(() => {
     if (inputRef.current) inputRef.current.focus()
   }, [])
@@ -112,7 +116,7 @@ export default function MessageInput({ onSendMessage, onSetNickname, replyingTo,
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             placeholder="Type a message..."
-            className="pr-10 w-full pl-2 pt-2 h-fit text-black dark:text-white dark:bg-zinc-800 rounded-md resize-none min-h-12"
+            className="pr-12 w-full pl-2 pt-2 h-fit text-black dark:text-white dark:bg-zinc-800 rounded-md resize-none min-h-12"
             onKeyDown={(e) => {
               if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
@@ -121,7 +125,7 @@ export default function MessageInput({ onSendMessage, onSetNickname, replyingTo,
             }}
           />
 
-          {/* 🎤 Voice Button inside the textbox right */}
+          {/* 🎤 Voice Button */}
           <button
             type="button"
             onClick={recording ? stopRecording : startRecording}
