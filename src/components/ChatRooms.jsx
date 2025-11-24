@@ -89,7 +89,7 @@ function ChatRooms() {
         <header className="sticky top-0 z-40 w-full backdrop-blur supports-[backdrop-filter]:bg-white/70 bg-white/80 border-b border-zinc-200">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="bg-gradient-to-br from-black to-[#8A6F29] text-white p-2 rounded-lg shadow-md border border-[#FFD369]">
+              <div className="bg-gradient-to-br from-[#FF6EC7] via-[#9D50FF] to-[#00D1FF] text-white p-2 rounded-lg shadow-md border border-transparent">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="h-6 w-6"
@@ -108,7 +108,7 @@ function ChatRooms() {
 
               {/* 🪄 Animated App Name with cursor hidden after typing */}
               <span
-                className="text-3xl font-extrabold tracking-wider select-none bg-gradient-to-r from-[#FFD369] via-[#8A6F29] to-[#6A501F] text-transparent bg-clip-text"
+                className="text-3xl font-extrabold tracking-wider select-none bg-gradient-to-r from-[#FF6EC7] via-[#9D50FF] via-[#00D1FF] to-[#00FFA3] text-transparent bg-clip-text"
                 style={{
                   fontFamily: "'Orbitron', sans-serif",
                   letterSpacing: "0.08em",
@@ -116,7 +116,11 @@ function ChatRooms() {
                 }}
               >
                 {typedText}
-                {showCursor && <span className="animate-pulse text-[#FFD369] drop-shadow-[0_0_10px_#FFD369]">|</span>}
+                {showCursor && (
+                  <span className="animate-pulse text-[#00FFA3] drop-shadow-[0_0_10px_#00FFA3]">
+                    |
+                  </span>
+                )}
               </span>
             </div>
           </div>
@@ -125,8 +129,7 @@ function ChatRooms() {
         {/* Main Content */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
           {/* Featured Room */}
-          <div className="mb-12 rounded-2xl overflow-hidden shadow-lg bg-gradient-to-r from-black via-[#8A6F29] to-[#FFD369] text-white relative border border-[#FFD369] neon-gold">
-            <div className="absolute inset-0 bg-black/20 backdrop-blur-[1px]" />
+          <div className="mb-12 rounded-2xl overflow-hidden shadow-lg bg-gradient-to-r from-[#FF6EC7] via-[#9D50FF] via-[#00D1FF] to-[#00FFA3] text-white relative neon-rainbow border-none">
             <div className="relative p-8 flex flex-col lg:flex-row items-center gap-8">
               <div className="flex-1">
                 <h2 className="text-2xl md:text-3xl font-semibold mb-3 tracking-tight">
@@ -138,7 +141,7 @@ function ChatRooms() {
                 </p>
                 <button
                   onClick={() => navigate(`/${rooms[0].id}`)}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#FFD369] text-black font-bold rounded-lg shadow hover:bg-[#f7c95d]"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-[#FF6EC7] via-[#9D50FF] to-[#00FFA3] text-white font-bold rounded-lg shadow hover:opacity-90"
                 >
                   Explore Now
                   <svg
@@ -180,7 +183,7 @@ function ChatRooms() {
                   onMouseEnter={() => setHoveredRoom(room.id)}
                   onMouseLeave={() => setHoveredRoom(null)}
                   onClick={() => navigate(`/${room.id}`)}
-                  className="group cursor-pointer bg-white rounded-xl overflow-hidden border border-transparent shadow-md hover:shadow-[0_0_18px_#FFD369] hover:border-[#FFD369] transition-all duration-300 fade-pop"
+                  className="group cursor-pointer bg-white rounded-xl overflow-hidden border border-transparent shadow-md hover:shadow-[0_0_18px_#9D50FF] hover:border-[#9D50FF] transition-all duration-300 fade-pop"
                 >
                   <div className="relative h-48">
                     <img
@@ -190,7 +193,7 @@ function ChatRooms() {
                     />
                     {hoveredRoom === room.id && (
                       <div className="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center transition-opacity duration-300">
-                        <button className="bg-[#FFD369] text-black px-4 py-2 font-bold hover:bg-[#f5cc6f]">
+                        <button className="bg-gradient-to-r from-[#FF6EC7] via-[#9D50FF] to-[#00FFA3] text-white px-4 py-2 font-bold hover:opacity-90">
                           Join Room
                         </button>
                       </div>
@@ -214,7 +217,7 @@ function ChatRooms() {
               target="_blank"
               className="text-base font-extrabold text-gray-800 hover:text-indigo-600 transition-colors duration-200"
             >
-              © 2025 <span className="text-[#FFD369]">Pixel Talkz</span>. Developed By{" "}
+              © 2025 <span className="bg-gradient-to-r from-[#FF6EC7] via-[#9D50FF] to-[#00FFA3] text-transparent bg-clip-text">Pixel Talkz</span>. Developed By{" "}
               <span className="text-purple-700">KISHORE R</span>
             </a>
           </div>
