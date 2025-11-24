@@ -10,17 +10,12 @@ export default function MessageInput({ onSendMessage, onSetNickname, replyingTo,
 
   const [message, setMessage] = useState("")
   const [error, setError] = useState(null)
-
-  // 🎤 Recorder States
-  const [recording, setRecording] = useState(false)
-  const recorderRef = useRef(null)
-  const chunks = useRef([])
-
   const inputRef = useRef(null)
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (!message.trim()) return
+
     const textToSend = message
     const replyTarget = replyingTo
 
@@ -36,45 +31,7 @@ export default function MessageInput({ onSendMessage, onSetNickname, replyingTo,
     if (inputRef.current) inputRef.current.focus()
   }
 
-  // 🎤 Start Recording
-  const startRecording = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-      const mediaRecorder = new MediaRecorder(stream, { mimeType: "audio/webm" })
-      recorderRef.current = mediaRecorder
-      chunks.current = []
-
-      mediaRecorder.ondataavailable = e => chunks.current.push(e.data)
-
-      mediaRecorder.onstop = async () => {
-        const blob = new Blob(chunks.current, { type: "audio/webm" })
-        await onSendMessage({ audio: blob }, replyingTo)
-        if (replyingTo) onCancelReply()
-      }
-
-      mediaRecorder.start()
-      setRecording(true)
-
-      // Auto stop after 60 seconds
-      setTimeout(() => {
-        if (mediaRecorder.state !== "inactive") mediaRecorder.stop()
-        setRecording(false)
-      }, 60000)
-
-    } catch (err) {
-      setError("Microphone permission denied")
-    }
-  }
-
-  // 🛑 Stop Recording Manually
-  const stopRecording = () => {
-    if (recorderRef.current && recorderRef.current.state !== "inactive") {
-      recorderRef.current.stop()
-      setRecording(false)
-    }
-  }
-
-  // Focus on mount
+  // Focus input on mount
   useEffect(() => {
     if (inputRef.current) inputRef.current.focus()
   }, [])
@@ -125,22 +82,18 @@ export default function MessageInput({ onSendMessage, onSetNickname, replyingTo,
             }}
           />
 
-          {/* 🎤 Voice Button */}
+          {/* 🎤 Placeholder Voice Button */}
           <button
             type="button"
-            onClick={recording ? stopRecording : startRecording}
+            onClick={() => alert("🎤 Recording Coming Soon!")}
             className="absolute right-2 bottom-2 text-zinc-500 hover:text-amber-500 transition"
-            title={recording ? "Stop Recording" : "Record Voice"}
+            title="Recording Coming Soon"
           >
-            {recording ? (
-              <span className="animate-pulse text-red-600 font-bold">●</span>
-            ) : (
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6"
-                fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round"
-                  d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm0 0v4m0 0h4m-4 0H8" />
-              </svg>
-            )}
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6"
+              fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round"
+                d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm0 0v4m0 0h4m-4 0H8" />
+            </svg>
           </button>
         </div>
 
