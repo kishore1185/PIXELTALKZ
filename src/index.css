@@ -134,3 +134,18 @@
   background: linear-gradient(90deg, #ff00ea, #ff7bf7, #00eaff, #00ffad);
   color: white;
 }
+
+.neon-rainbow {
+  box-shadow: 0 0 14px rgba(255, 110, 199, 0.7),
+              0 0 18px rgba(157, 80, 255, 0.6),
+              0 0 22px rgba(0, 209, 255, 0.6),
+              0 0 26px rgba(0, 255, 163, 0.7);
+  transition: all .35s ease-in-out;
+}
+.neon-rainbow:hover {
+  box-shadow: 0 0 20px rgba(255, 110, 199, 1),
+              0 0 22px rgba(157, 80, 255, 1),
+              0 0 26px rgba(0, 209, 255, 1),
+              0 0 30px rgba(0, 255, 163, 1);
+  transform: translateY(-3px) scale(1.03);
+}
