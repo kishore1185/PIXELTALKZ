@@ -38,6 +38,7 @@ export default function MessageItem({ message, isCurrentUser, onReply }) {
   const codeRef = useRef(null);
 
   const isAi = message.isAi === true;
+  const isAudio = !!message.audioUrl; // ✅ voice message flag
 
   // Load Prism.js and dependencies in sequence
   useEffect(() => {
@@ -118,13 +119,13 @@ export default function MessageItem({ message, isCurrentUser, onReply }) {
       /```[\s\S]*?```/g,
       /`[^`\n]+`/g,
       /<[^>]+>[\s\S]*?<\/[^>]+>/g,
-      /function\s+\w+\s*\([^)]*\)\s*\{/g,
+      /function\s+\w+\s*$begin:math:text$\[\^\)\]\*$end:math:text$\s*\{/g,
       /class\s+\w+[\s\S]*?\{/g,
       /import\s+.*from\s+['"][^'"]+['"]/g,
       /export\s+(default\s+)?(function|class|const|let|var)/g,
       /#include\s*<.*>/g,
       /public\s+static\s+void\s+main/g,
-      /def\s+\w+\s*\([^)]*\)\s*:/g,
+      /def\s+\w+\s*$begin:math:text$\[\^\)\]\*$end:math:text$\s*:/g,
       /\w+\s*:\s*\w+\s*[{;][\s\S]*?}/g,
       /\$\w+\s*=.*[;]?/g,
       /SELECT\s+.*FROM\s+/gi,
@@ -148,7 +149,7 @@ export default function MessageItem({ message, isCurrentUser, onReply }) {
     return codePatterns.some((pattern) => pattern.test(text));
   };
 
-  const isCodeMessage = detectCode(message.text);
+  const isCodeMessage = message.text ? detectCode(message.text) : false;
 
   // Detect programming language
   const detectLanguage = (text) => {
@@ -229,18 +230,20 @@ export default function MessageItem({ message, isCurrentUser, onReply }) {
     return "text";
   };
 
-  const language = isCodeMessage ? detectLanguage(message.text) : "text";
+  const language = isCodeMessage ? detectLanguage(message.text || "") : "text";
 
   // Format code text for display
   const formatCodeText = (text) => {
-    return text.replace(/```\w*\n?/g, "").replace(/```$/g, "").trim();
+    return (text || "").replace(/```\w*\n?/g, "").replace(/```$/g, "").trim();
   };
 
   // Copy to clipboard
   const handleCopy = async (e) => {
     e.stopPropagation();
     try {
-      const textToCopy = isCodeMessage ? formatCodeText(message.text) : message.text;
+      const textToCopy = isCodeMessage
+        ? formatCodeText(message.text || "")
+        : (message.text || (isAudio ? "[Voice message]" : ""));
       await navigator.clipboard.writeText(textToCopy);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
@@ -425,7 +428,23 @@ export default function MessageItem({ message, isCurrentUser, onReply }) {
                 Reply ↩
               </div>
             )}
-            {isCodeMessage && prismLoaded ? (
+
+            {/* 🔊 AUDIO MESSAGE VIEW */}
+            {isAudio ? (
+              <div className="md:pl-4 pl-3 pb-4 md:pb-2 pt-2 pr-3 md:pr-20 min-w-32 md:min-w-0 relative">
+                <p className="text-sm md:text-base font-medium mb-2">
+                  🎧 Voice message
+                </p>
+                <audio
+                  controls
+                  src={message.audioUrl}
+                  className="w-full mt-1"
+                />
+                <span className="text-xs bottom-1 absolute right-2 opacity-70">
+                  {formatTimestamp(message.timestamp)}
+                </span>
+              </div>
+            ) : isCodeMessage && prismLoaded ? (
               <div className="relative w-full">
                 <div className="flex items-center justify-between px-3 py-2 bg-zinc-700 dark:bg-zinc-900 border-b border-zinc-600 dark:border-zinc-700">
                   <div className="flex items-center gap-2">
@@ -492,7 +511,7 @@ export default function MessageItem({ message, isCurrentUser, onReply }) {
                         fontFamily: 'Monaco, Menlo, "Ubuntu Mono", Consolas, monospace',
                       }}
                     >
-                      {formatCodeText(message.text)}
+                      {formatCodeText(message.text || "")}
                     </code>
                   </pre>
                 </div>
@@ -541,14 +560,17 @@ export default function MessageItem({ message, isCurrentUser, onReply }) {
                     )}
                   </button>
                 )}
-                <p className="break-words text-sm md:text-base whitespace-pre-wrap">{message.text}</p>
+                <p className="break-words text-sm md:text-base whitespace-pre-wrap">
+                  {message.text}
+                </p>
                 <span className="text-xs bottom-1 absolute right-2 opacity-70">
                   {formatTimestamp(message.timestamp)}
                 </span>
               </div>
             )}
-            {/* Mobile copy button (long press) */}
-            {isMobile() && showMobileCopy && (
+
+            {/* Mobile copy button (long press) – disable for audio */}
+            {isMobile() && showMobileCopy && !isAudio && (
               <div className="absolute -top-8 left-1/2 -translate-x-1/2 z-50">
                 <button
                   onClick={handleCopy}
