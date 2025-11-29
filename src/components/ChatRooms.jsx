@@ -15,7 +15,7 @@ function ChatRooms() {
   const [typedText, setTypedText] = useState("");
   const [showCursor, setShowCursor] = useState(true);
 
-  // ✅ Typewriter effect (cursor hides after typing)
+  // Typewriter effect
   useEffect(() => {
     const fullText = "Pixel Talkz";
     let index = 0;
@@ -25,13 +25,12 @@ function ChatRooms() {
         index++;
       } else {
         clearInterval(interval);
-        setTimeout(() => setShowCursor(false), 800); // Hide cursor smoothly
+        setTimeout(() => setShowCursor(false), 800);
       }
-    }, 150); // Typing speed
+    }, 150);
     return () => clearInterval(interval);
   }, []);
 
-  // ✅ Force Light Mode (prevents theme leak from rooms)
   useEffect(() => {
     document.documentElement.classList.remove("dark");
     document.body.classList.remove("dark");
@@ -45,8 +44,7 @@ function ChatRooms() {
       name: "Fun Chat",
       id: "messages",
       image: funchat_image,
-      description:
-        "Connect and chat with others about anything fun and interesting",
+      description: "Connect and chat with others about anything fun and interesting",
     },
     {
       name: "Study",
@@ -82,14 +80,13 @@ function ChatRooms() {
       style={{ backgroundImage: "url('/chatbg.png')" }}
       data-theme="light"
     >
-
-      {/* Content */}
       <div className="relative z-10">
         {/* Navbar */}
         <header className="sticky top-0 z-40 w-full backdrop-blur supports-[backdrop-filter]:bg-white/70 bg-white/80 border-b border-zinc-200">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="bg-gradient-to-br from-[#FF6EC7] via-[#9D50FF] to-[#00D1FF] text-white p-2 rounded-lg shadow-md border border-transparent">
+              {/* Logo block */}
+              <div className="bg-gradient-to-r from-[#6B2FA6] via-[#C7A7FF] to-[#FDF8F3] text-white p-2 rounded-lg shadow-md">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="h-6 w-6"
@@ -106,9 +103,9 @@ function ChatRooms() {
                 </svg>
               </div>
 
-              {/* 🪄 Animated App Name with cursor hidden after typing */}
+              {/* Title */}
               <span
-                className="text-3xl font-extrabold tracking-wider select-none bg-gradient-to-r from-[#FF6EC7] via-[#9D50FF] via-[#00D1FF] to-[#00FFA3] text-transparent bg-clip-text"
+                className="text-3xl font-extrabold tracking-wider select-none bg-gradient-to-r from-[#6B2FA6] via-[#C7A7FF] to-[#FDF8F3] text-transparent bg-clip-text"
                 style={{
                   fontFamily: "'Orbitron', sans-serif",
                   letterSpacing: "0.08em",
@@ -117,7 +114,7 @@ function ChatRooms() {
               >
                 {typedText}
                 {showCursor && (
-                  <span className="animate-pulse text-[#00FFA3] drop-shadow-[0_0_10px_#00FFA3]">
+                  <span className="animate-pulse text-[#6B2FA6]">
                     |
                   </span>
                 )}
@@ -128,20 +125,23 @@ function ChatRooms() {
 
         {/* Main Content */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-          {/* Featured Room */}
-          <div className="mb-12 rounded-2xl overflow-hidden shadow-lg bg-gradient-to-r from-[#FF6EC7] via-[#9D50FF] via-[#00D1FF] to-[#00FFA3] text-white relative neon-rainbow border-none">
+
+          {/* ⭐ FEATURED ROOM — Purple → Lavender → Cream */}
+          <div className="mb-12 rounded-2xl overflow-hidden shadow-purple-glow bg-gradient-to-r from-[#6B2FA6] via-[#C7A7FF] to-[#FDF8F3] text-gray-900 relative">
+            <div className="absolute inset-0 bg-white/10 backdrop-blur-sm" />
+
             <div className="relative p-8 flex flex-col lg:flex-row items-center gap-8">
               <div className="flex-1">
-                <h2 className="text-2xl md:text-3xl font-semibold mb-3 tracking-tight">
+                <h2 className="text-2xl md:text-3xl font-semibold mb-3 tracking-tight text-purple-900">
                   Featured Room
                 </h2>
-                <p className="mb-5 text-gray-100/90 leading-relaxed max-w-xl">
+                <p className="mb-5 text-gray-700 leading-relaxed max-w-xl">
                   Explore our most active space and meet people already chatting.
                   Jump in or pick another room below.
                 </p>
                 <button
                   onClick={() => navigate(`/${rooms[0].id}`)}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-[#FF6EC7] via-[#9D50FF] to-[#00FFA3] text-white font-bold rounded-lg shadow hover:opacity-90"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-[#6B2FA6] via-[#C7A7FF] to-[#FDF8F3] text-white font-bold rounded-lg shadow-md hover:opacity-90"
                 >
                   Explore Now
                   <svg
@@ -152,11 +152,7 @@ function ChatRooms() {
                     stroke="currentColor"
                     strokeWidth={2}
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M9 5l7 7-7 7"
-                    />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                   </svg>
                 </button>
               </div>
@@ -165,7 +161,7 @@ function ChatRooms() {
                 <img
                   src={collegelife_image}
                   alt="college life banner"
-                  className="rounded-xl shadow-lg w-full object-cover h-56 ring-1 ring-white/20"
+                  className="rounded-xl shadow-lg w-full object-cover h-56 ring-1 ring-purple-200"
                 />
               </div>
             </div>
@@ -173,9 +169,7 @@ function ChatRooms() {
 
           {/* Room Categories */}
           <div className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6">
-              Discover Rooms
-            </h2>
+            <h2 className="text-2xl md:text-3xl font-extrabold mb-6">Discover Rooms</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {rooms.map((room) => (
                 <div
@@ -183,7 +177,7 @@ function ChatRooms() {
                   onMouseEnter={() => setHoveredRoom(room.id)}
                   onMouseLeave={() => setHoveredRoom(null)}
                   onClick={() => navigate(`/${room.id}`)}
-                  className="group cursor-pointer bg-white rounded-xl overflow-hidden border border-transparent shadow-md hover:shadow-[0_0_18px_#9D50FF] hover:border-[#9D50FF] transition-all duration-300 fade-pop"
+                  className="group cursor-pointer bg-white rounded-xl overflow-hidden neon-lavender hover:shadow-purple-glow transition-all duration-300 fade-pop"
                 >
                   <div className="relative h-48">
                     <img
@@ -193,7 +187,7 @@ function ChatRooms() {
                     />
                     {hoveredRoom === room.id && (
                       <div className="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center transition-opacity duration-300">
-                        <button className="bg-gradient-to-r from-[#FF6EC7] via-[#9D50FF] to-[#00FFA3] text-white px-4 py-2 font-bold hover:opacity-90">
+                        <button className="bg-gradient-to-r from-[#6B2FA6] via-[#C7A7FF] to-[#FDF8F3] text-white px-4 py-2 font-bold hover:opacity-90">
                           Join Room
                         </button>
                       </div>
@@ -215,10 +209,10 @@ function ChatRooms() {
             <a
               href="https://kishorer.vercel.app/"
               target="_blank"
-              className="text-base font-extrabold text-gray-800 hover:text-indigo-600 transition-colors duration-200"
+              className="text-base font-medium text-black"
+              style={{ fontFamily: "Horizon, sans-serif" }}
             >
-              © 2025 <span className="bg-gradient-to-r from-[#FF6EC7] via-[#9D50FF] to-[#00FFA3] text-transparent bg-clip-text">Pixel Talkz</span>. Developed By{" "}
-              <span className="text-purple-700">KISHORE R</span>
+              © 2025 Pixel Talkz. Developed By R.KISHORE 
             </a>
           </div>
         </div>

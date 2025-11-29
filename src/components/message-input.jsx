@@ -10,6 +10,12 @@ export default function MessageInput({ onSendMessage, onSetNickname, replyingTo,
 
   const [message, setMessage] = useState("")
   const [error, setError] = useState(null)
+
+  // 🎤 Recording state
+  const [recording, setRecording] = useState(false)
+  const [recorder, setRecorder] = useState(null)
+  const chunks = useRef([])
+
   const inputRef = useRef(null)
 
   const handleSubmit = async (e) => {
@@ -31,6 +37,48 @@ export default function MessageInput({ onSendMessage, onSetNickname, replyingTo,
     if (inputRef.current) inputRef.current.focus()
   }
 
+  // 🎤 Start Recording
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+      const mediaRecorder = new MediaRecorder(stream)
+
+      setRecorder(mediaRecorder)
+      chunks.current = []
+      mediaRecorder.start()
+      setRecording(true)
+
+      mediaRecorder.ondataavailable = e => chunks.current.push(e.data)
+
+      mediaRecorder.onstop = async () => {
+        const blob = new Blob(chunks.current, { type: "audio/webm" })
+
+        await onSendMessage({ audio: blob }, replyingTo)
+        if (replyingTo) onCancelReply()
+      }
+
+      // Auto stop after 60s
+      setTimeout(() => {
+        if (mediaRecorder.state !== "inactive") {
+          mediaRecorder.stop()
+          setRecording(false)
+        }
+      }, 60000)
+
+    } catch (err) {
+      setError("Microphone permission denied")
+      console.error(err)
+    }
+  }
+
+  // 🎤 Stop Recording
+  const stopRecording = () => {
+    if (recorder && recorder.state !== "inactive") {
+      recorder.stop()
+      setRecording(false)
+    }
+  }
+
   // Focus input on mount
   useEffect(() => {
     if (inputRef.current) inputRef.current.focus()
@@ -42,7 +90,11 @@ export default function MessageInput({ onSendMessage, onSetNickname, replyingTo,
 
   return (
     <div className="border-t px-4 pt-4">
-      {error && <div className="mb-2 p-2 bg-destructive/10 text-destructive text-sm rounded">{error}</div>}
+      {error && (
+        <div className="mb-2 p-2 bg-destructive/10 text-destructive text-sm rounded">
+          {error}
+        </div>
+      )}
 
       <ReplyPreview message={replyingTo} onCancel={onCancelReply} />
 
@@ -82,18 +134,25 @@ export default function MessageInput({ onSendMessage, onSetNickname, replyingTo,
             }}
           />
 
-          {/* 🎤 Placeholder Voice Button */}
+          {/* 🎤 Voice Button */}
           <button
             type="button"
-            onClick={() => alert("🎤 Recording Coming Soon!")}
+            onClick={recording ? stopRecording : startRecording}
             className="absolute right-2 bottom-2 text-zinc-500 hover:text-amber-500 transition"
-            title="Recording Coming Soon"
+            title={recording ? "Stop Recording" : "Record Voice"}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6"
-              fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round"
-                d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm0 0v4m0 0h4m-4 0H8" />
-            </svg>
+            {recording ? (
+              <span className="text-red-600 font-bold animate-pulse">●</span>
+            ) : (
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6"
+                fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm0 0v4m0 0h4m-4 0H8"
+                />
+              </svg>
+            )}
           </button>
         </div>
 

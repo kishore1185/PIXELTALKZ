@@ -59,28 +59,16 @@ export async function generateAIResponse(question) {
 
   // First attempt: Gemini-style body (current behavior)
   try {
-    const response = await fetch('https://still-lake-1a8f.talaganarajesh25.workers.dev/', {
+    const response = await fetch('https://pixeltalkz-ai.2005kishore-sb.workers.dev/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json'
       },
       body: JSON.stringify({
-        contents: [
-          {
-            role: 'user',
-            parts: [{ text: `You are an AI with humor and sarcasm with correct facts. Follow these rules:\n
-                1. Keep responses short and helpful.\n
-                2. Maintain context from previous messages.\n
-                3. Always respond in English text, but adapt the language:\n
-                   - If the user types in Hindi, reply in Hindi but using English script.\n
-                User's message: "${question}"` }]
-          }
-        ],
-        generationConfig: {
-          maxOutputTokens: 150
-        }
-      })
+  message: question
+})
+
     });
 
     const contentType = response.headers.get('content-type') || '';
@@ -114,20 +102,16 @@ export async function generateAIResponse(question) {
 
   // Second attempt: simpler payload many CF workers expect
   try {
-    const response2 = await fetch('https://still-lake-1a8f.talaganarajesh25.workers.dev/', {
+    const response2 = await fetch('https://pixeltalkz-ai.2005kishore-sb.workers.dev/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json'
       },
       body: JSON.stringify({
-        contents: [
-          {
-            role: 'user',
-            parts: [{ text: String(question) }]
-          }
-        ]
-      })
+  message: question
+})
+
     });
 
     const contentType2 = response2.headers.get('content-type') || '';
