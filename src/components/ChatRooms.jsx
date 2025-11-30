@@ -103,20 +103,25 @@ function ChatRooms() {
                 </svg>
               </div>
 
-              {/* Title */}
+              {/* Title with Neon Glow */}
               <span
-                className="text-3xl font-extrabold tracking-wider select-none bg-gradient-to-r from-[#6B2FA6] via-[#C7A7FF] to-[#FDF8F3] text-transparent bg-clip-text"
+                className="
+                  text-3xl font-extrabold tracking-wider select-none
+                  bg-gradient-to-r from-[#6B2FA6] via-[#C7A7FF] to-[#FDF8F3]
+                  text-transparent bg-clip-text
+                  drop-shadow-[0_0_6px_rgba(199,167,255,0.9)]
+                "
                 style={{
                   fontFamily: "'Orbitron', sans-serif",
                   letterSpacing: "0.08em",
                   whiteSpace: "nowrap",
+                  filter:
+                    "drop-shadow(0 0 4px rgba(203,146,255,0.9)) drop-shadow(0 0 10px rgba(203,146,255,0.6))",
                 }}
               >
                 {typedText}
                 {showCursor && (
-                  <span className="animate-pulse text-[#6B2FA6]">
-                    |
-                  </span>
+                  <span className="animate-pulse text-[#6B2FA6]">|</span>
                 )}
               </span>
             </div>
@@ -135,10 +140,19 @@ function ChatRooms() {
                 <h2 className="text-2xl md:text-3xl font-semibold mb-3 tracking-tight text-purple-900">
                   Featured Room
                 </h2>
-                <p className="mb-5 text-gray-700 leading-relaxed max-w-xl">
+
+                {/* ⭐ Gradient White → Black text */}
+                <p
+                  className="
+                    mb-5 leading-relaxed max-w-xl 
+                    bg-gradient-to-r from-white via-gray-700 to-black 
+                    bg-clip-text text-transparent
+                  "
+                >
                   Explore our most active space and meet people already chatting.
                   Jump in or pick another room below.
                 </p>
+
                 <button
                   onClick={() => navigate(`/${rooms[0].id}`)}
                   className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-[#6B2FA6] via-[#C7A7FF] to-[#FDF8F3] text-white font-bold rounded-lg shadow-md hover:opacity-90"
@@ -212,7 +226,7 @@ function ChatRooms() {
               className="text-base font-medium text-black"
               style={{ fontFamily: "Horizon, sans-serif" }}
             >
-              © 2025 Pixel Talkz. Developed By R.KISHORE 
+              © 2025 Pixel Talkz. Developed By R.KISHORE
             </a>
           </div>
         </div>
