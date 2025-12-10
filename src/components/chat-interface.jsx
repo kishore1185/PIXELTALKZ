@@ -18,6 +18,7 @@ export function ChatInterface({ isChatRoom }) {
     error,
     userSession,
     sendMessage,
+    sendAudioMessage,
     setNickname,
     messagesEndRef,
     replyingTo,
@@ -132,6 +133,7 @@ export function ChatInterface({ isChatRoom }) {
 
         <MessageInput
           onSendMessage={sendMessage}
+          onSendAudioMessage={sendAudioMessage}
           nickname={userSession.nickname}
           onSetNickname={setNickname}
           replyingTo={replyingTo}

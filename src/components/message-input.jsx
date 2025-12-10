@@ -5,8 +5,15 @@ import { Button } from "./ui/button"
 import { Input } from "./ui/input"
 import ReplyPreview from "./ReplyPreview.jsx";
 
-export default function MessageInput({ onSendMessage, onSetNickname, replyingTo,
-  onCancelReply, aiEnabled, setAiEnabled }) {
+export default function MessageInput({
+  onSendMessage,
+  onSendAudioMessage,   // ✅ added
+  onSetNickname,
+  replyingTo,
+  onCancelReply,
+  aiEnabled,
+  setAiEnabled
+}) {
 
   const [message, setMessage] = useState("")
   const [error, setError] = useState(null)
@@ -14,10 +21,19 @@ export default function MessageInput({ onSendMessage, onSetNickname, replyingTo,
   // 🎤 Recording state
   const [recording, setRecording] = useState(false)
   const [recorder, setRecorder] = useState(null)
+  const [timer, setTimer] = useState(0)
+  const [cancelling, setCancelling] = useState(false)
+
   const chunks = useRef([])
+  const timerRef = useRef(null)
+  const holdAreaRef = useRef(null)
+  const startXRef = useRef(null)
 
   const inputRef = useRef(null)
 
+  // ================================
+  // 🟣 Send TEXT message
+  // ================================
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (!message.trim()) return
@@ -29,41 +45,51 @@ export default function MessageInput({ onSendMessage, onSetNickname, replyingTo,
     if (replyTarget) onCancelReply()
 
     const result = await onSendMessage(textToSend, replyTarget)
-    if (result.success) setError(null)
-    else if (result.error) {
+    if (!result.success) {
       setError(result.error)
       setMessage(textToSend)
     }
     if (inputRef.current) inputRef.current.focus()
   }
 
+  // ================================
   // 🎤 Start Recording
+  // ================================
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
       const mediaRecorder = new MediaRecorder(stream)
-
       setRecorder(mediaRecorder)
+
       chunks.current = []
       mediaRecorder.start()
       setRecording(true)
+      setCancelling(false)
+      setTimer(0)
 
       mediaRecorder.ondataavailable = e => chunks.current.push(e.data)
 
       mediaRecorder.onstop = async () => {
+        if (cancelling) return
+
         const blob = new Blob(chunks.current, { type: "audio/webm" })
 
-        await onSendMessage({ audio: blob }, replyingTo)
+        // ✅ FIXED: send audio ONLY through sendAudioMessage
+        await onSendAudioMessage(blob, replyingTo)
+
         if (replyingTo) onCancelReply()
       }
 
-      // Auto stop after 60s
-      setTimeout(() => {
-        if (mediaRecorder.state !== "inactive") {
-          mediaRecorder.stop()
-          setRecording(false)
-        }
-      }, 60000)
+      // Start timer
+      timerRef.current = setInterval(() => {
+        setTimer(prev => {
+          if (prev >= 59) {
+            stopRecording()
+            return 60
+          }
+          return prev + 1
+        })
+      }, 1000)
 
     } catch (err) {
       setError("Microphone permission denied")
@@ -71,15 +97,55 @@ export default function MessageInput({ onSendMessage, onSetNickname, replyingTo,
     }
   }
 
-  // 🎤 Stop Recording
+  // ================================
+  // 🎤 Stop Recording (Send)
+  // ================================
   const stopRecording = () => {
-    if (recorder && recorder.state !== "inactive") {
-      recorder.stop()
-      setRecording(false)
+    if (!recorder) return
+    if (recorder.state !== "inactive") recorder.stop()
+
+    setRecording(false)
+    clearInterval(timerRef.current)
+  }
+
+  // ================================
+  // ❌ Cancel Recording
+  // ================================
+  const cancelRecording = () => {
+    setCancelling(true)
+    if (recorder && recorder.state !== "inactive") recorder.stop()
+    clearInterval(timerRef.current)
+    setRecording(false)
+    chunks.current = []
+  }
+
+  // ================================
+  // 🟣 Touch events for Hold-to-Record + Slide-to-Cancel
+  // ================================
+  const handleTouchStart = (e) => {
+    startXRef.current = e.touches[0].clientX
+    startRecording()
+  }
+
+  const handleTouchMove = (e) => {
+    if (!recording) return
+    const diff = e.touches[0].clientX - startXRef.current
+
+    if (diff < -70) {
+      setCancelling(true)
+    } else {
+      setCancelling(false)
     }
   }
 
-  // Focus input on mount
+  const handleTouchEnd = () => {
+    if (!recording) return
+    cancelling ? cancelRecording() : stopRecording()
+  }
+
+  // ================================
+  // Auto focus input
+  // ================================
   useEffect(() => {
     if (inputRef.current) inputRef.current.focus()
   }, [])
@@ -103,12 +169,11 @@ export default function MessageInput({ onSendMessage, onSetNickname, replyingTo,
         <button
           type="button"
           onClick={() => setAiEnabled(prev => !prev)}
-          className={`relative w-16 px-1 h-8 flex items-center justify-between rounded-full transition-all duration-300 overflow-hidden text-xs font-semibold ${aiEnabled ? 'bg-amber-500 text-black' : 'bg-gray-300 text-gray-600'}`}
-          aria-pressed={aiEnabled}
+          className={`relative w-16 px-1 h-8 flex items-center justify-between rounded-full transition-all duration-300 overflow-hidden text-xs font-semibold ${aiEnabled ? "bg-amber-500 text-black" : "bg-gray-300 text-gray-600"}`}
         >
-          <span className={`absolute left-3 transition-opacity ${aiEnabled ? 'opacity-100' : 'opacity-0'}`}>AI</span>
-          <span className={`w-5 h-5 bg-zinc-600 rounded-full shadow-md transition-all duration-300 transform ${aiEnabled ? 'translate-x-9' : 'translate-x-0'}`}></span>
-          <span className={`absolute right-3 transition-opacity ${!aiEnabled ? 'opacity-100' : 'opacity-0'}`}>AI</span>
+          <span className={`absolute left-3 ${aiEnabled ? "opacity-100" : "opacity-0"}`}>AI</span>
+          <span className={`w-5 h-5 bg-zinc-600 rounded-full shadow-md transform transition-all duration-300 ${aiEnabled ? "translate-x-9" : "translate-x-0"}`}></span>
+          <span className={`absolute right-3 ${!aiEnabled ? "opacity-100" : "opacity-0"}`}>AI</span>
         </button>
 
         <Input
@@ -120,6 +185,8 @@ export default function MessageInput({ onSendMessage, onSetNickname, replyingTo,
 
       <form onSubmit={handleSubmit} className="flex gap-2">
         <div className="relative flex-1">
+
+          {/* 📌 Text Input */}
           <textarea
             ref={inputRef}
             value={message}
@@ -127,33 +194,45 @@ export default function MessageInput({ onSendMessage, onSetNickname, replyingTo,
             placeholder="Type a message..."
             className="pr-12 w-full pl-2 pt-2 h-fit text-black dark:text-white dark:bg-zinc-800 rounded-md resize-none min-h-12"
             onKeyDown={(e) => {
-              if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                handleSubmit(e);
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault()
+                handleSubmit(e)
               }
             }}
           />
 
-          {/* 🎤 Voice Button */}
+          {/* 🎤 HOLD TO RECORD */}
           <button
+            ref={holdAreaRef}
             type="button"
-            onClick={recording ? stopRecording : startRecording}
-            className="absolute right-2 bottom-2 text-zinc-500 hover:text-amber-500 transition"
-            title={recording ? "Stop Recording" : "Record Voice"}
+            onMouseDown={startRecording}
+            onMouseUp={() => (!cancelling ? stopRecording() : cancelRecording())}
+            onMouseLeave={() => recording && cancelRecording()}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+            className="absolute right-2 bottom-2 text-zinc-500 hover:text-amber-500 transition select-none"
+            title="Hold to Record"
           >
             {recording ? (
-              <span className="text-red-600 font-bold animate-pulse">●</span>
+              <span className={`font-bold ${cancelling ? "text-gray-400" : "text-red-600"} animate-pulse`}>
+                ● {timer < 10 ? `0${timer}` : timer}s
+              </span>
             ) : (
               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6"
                 fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
+                <path strokeLinecap="round" strokeLinejoin="round"
                   d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm0 0v4m0 0h4m-4 0H8"
                 />
               </svg>
             )}
           </button>
+
+          {recording && (
+            <div className="absolute -top-6 right-0 text-xs text-red-500 animate-pulse">
+              {cancelling ? "Release to Cancel ❌" : "Slide left to cancel ←"}
+            </div>
+          )}
         </div>
 
         <Button type="submit" className="h-12" disabled={!message.trim()}>

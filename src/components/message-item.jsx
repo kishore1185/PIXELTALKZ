@@ -38,7 +38,7 @@ export default function MessageItem({ message, isCurrentUser, onReply }) {
   const codeRef = useRef(null);
 
   const isAi = message.isAi === true;
-  const isAudio = !!message.audioUrl; // ✅ voice message flag
+  const isAudio = !!message.audioBase64; // ✅ voice message flag
 
   // Load Prism.js and dependencies in sequence
   useEffect(() => {
@@ -437,7 +437,7 @@ export default function MessageItem({ message, isCurrentUser, onReply }) {
                 </p>
                 <audio
                   controls
-                  src={message.audioUrl}
+                  src={message.audioBase64}
                   className="w-full mt-1"
                 />
                 <span className="text-xs bottom-1 absolute right-2 opacity-70">

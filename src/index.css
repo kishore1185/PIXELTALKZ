@@ -138,3 +138,7 @@
               0 0 28px rgba(191,148,228,0.45);
   transform: translateY(-4px) scale(1.015);
 }
+:root {
+  --pixel-gradient: linear-gradient(135deg, #C7A7FF 0%, #C7A7FF 60%, #40E0D0 85%, #007BFF 100%);
+  --pixel-glow: 0 0 8px rgba(199,167,255,0.45), 0 0 14px rgba(64,224,208,0.35), 0 0 20px rgba(0,123,255,0.30);
+}
