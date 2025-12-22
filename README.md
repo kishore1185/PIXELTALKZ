@@ -66,7 +66,7 @@ Pixel Talkz is built for:
 	•	AI behaves like a real user
 	•	Context-aware responses
 	•	AI replies stored just like normal messages
-	•	Powered by Groq (LLaMA models) via Cloudflare Workers
+	•	Powered by  (LLaMA models) via Cloudflare Workers
 
 AI is not a popup.
 AI is part of the conversation.
@@ -118,7 +118,7 @@ Backend
 	•	Cloudflare Workers (AI proxy & security)
 
 AI Layer
-	•	Groq API
+	•	AI API
 	•	LLaMA-based models
 	•	Ultra-low latency inference
   User
@@ -127,7 +127,7 @@ Pixel Talkz UI
   ↓
 Cloudflare Worker
   ↓
-Groq AI
+ AI
   ↓
 Firestore
   ↓
@@ -154,8 +154,10 @@ Make sure you have the following installed:
 cd pixel-talkz
 📥 Install Dependencies
 npm install
-# or
+ or
 pnpm install
+
+-----------
 
 🔥 Firebase Setup
 	1.	Go to Firebase Console
